@@ -1,0 +1,141 @@
+{
+  "generated_at": "2026-01-23T01:56:12",
+  "processing_time": 34.08,
+  "files_analyzed": 4,
+  "total_classes": 3,
+  "total_functions": 29,
+  "llm_model": "deepseek-coder",
+  "semantic_version": "1.0.0",
+  "codebase_path": "test-flask-app",
+  "git_hash": "nogit",
+  "codebase_profile": {
+    "path": "test-flask-app",
+    "language": "python",
+    "languages": [
+      "python"
+    ],
+    "features": [
+      "oop"
+    ],
+    "frameworks": [],
+    "architectural_patterns": [],
+    "has_database": false,
+    "has_api": false,
+    "has_async": false,
+    "has_tests": false,
+    "has_deployment_configs": false,
+    "complexity": {
+      "total_files": 4,
+      "total_classes": 3,
+      "total_functions": 29,
+      "total_lines": 0,
+      "avg_dependencies": 14.5,
+      "coupling_score": 0.018,
+      "size_category": "tiny"
+    },
+    "project_type": "cli_tool",
+    "metadata": {
+      "total_files": 4,
+      "total_classes": 3,
+      "total_functions": 29,
+      "total_imports": 13,
+      "total_nodes": 57,
+      "total_edges": 58
+    }
+  },
+  "diagrams_generated": 5,
+  "diagrams_successful": 5,
+  "diagram_types": [
+    "component",
+    "class",
+    "c4_context",
+    "activity",
+    "data_flow"
+  ],
+  "average_quality_score": 81.5,
+  "validation_results": {
+    "component": {
+      "diagram_type": "component",
+      "scores": {
+        "syntax": 75.0,
+        "completeness": 40,
+        "clarity": 50.0,
+        "accuracy": 100
+      },
+      "overall_score": 66.25,
+      "issues": [
+        "No relationships between components"
+      ],
+      "recommendations": [
+        "Show dependencies with arrows (-->)",
+        "Consider showing external dependencies"
+      ],
+      "validated": true
+    },
+    "class": {
+      "diagram_type": "class",
+      "scores": {
+        "syntax": 100.0,
+        "completeness": 55,
+        "clarity": 100.0,
+        "accuracy": 100
+      },
+      "overall_score": 88.75,
+      "issues": [
+        "No relationships between classes"
+      ],
+      "recommendations": [
+        "Show inheritance (<|--), composition (*--), and associations (-->)"
+      ],
+      "validated": true
+    },
+    "c4_context": {
+      "diagram_type": "c4_context",
+      "scores": {
+        "syntax": 100.0,
+        "completeness": 80,
+        "clarity": 100.0,
+        "accuracy": 75
+      },
+      "overall_score": 88.75,
+      "issues": [],
+      "recommendations": [
+        "Show external systems: {{External System}}"
+      ],
+      "validated": true
+    },
+    "activity": {
+      "diagram_type": "activity",
+      "scores": {
+        "syntax": 100.0,
+        "completeness": 85,
+        "clarity": 95.0,
+        "accuracy": 75
+      },
+      "overall_score": 88.75,
+      "issues": [],
+      "recommendations": [
+        "Add decision points for conditionals: {Decision?}"
+      ],
+      "validated": true
+    },
+    "data_flow": {
+      "diagram_type": "data_flow",
+      "scores": {
+        "syntax": 100.0,
+        "completeness": 55,
+        "clarity": 70.0,
+        "accuracy": 75
+      },
+      "overall_score": 75.0,
+      "issues": [],
+      "recommendations": [
+        "Show data sources with ([External Entity])",
+        "Include data stores if applicable: [(Database)]"
+      ],
+      "validated": true
+    }
+  },
+  "shared_entities": 0,
+  "diagram_connections": 0
+}

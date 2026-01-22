@@ -1,0 +1,135 @@
+{
+  "generated_at": "2026-01-23T01:50:58",
+  "processing_time": 0.02,
+  "files_analyzed": 4,
+  "total_classes": 3,
+  "total_functions": 29,
+  "llm_model": "deepseek-coder",
+  "semantic_version": "1.0.0",
+  "codebase_path": "test-flask-app",
+  "git_hash": "nogit",
+  "codebase_profile": {
+    "path": "test-flask-app",
+    "language": "python",
+    "languages": [
+      "python"
+    ],
+    "features": [
+      "oop"
+    ],
+    "frameworks": [],
+    "architectural_patterns": [],
+    "has_database": false,
+    "has_api": false,
+    "has_async": false,
+    "has_tests": false,
+    "has_deployment_configs": false,
+    "complexity": {
+      "total_files": 4,
+      "total_classes": 3,
+      "total_functions": 29,
+      "total_lines": 0,
+      "avg_dependencies": 14.5,
+      "coupling_score": 0.018,
+      "size_category": "tiny"
+    },
+    "project_type": "cli_tool",
+    "metadata": {
+      "total_files": 4,
+      "total_classes": 3,
+      "total_functions": 29,
+      "total_imports": 13,
+      "total_nodes": 57,
+      "total_edges": 58
+    }
+  },
+  "diagrams_generated": 5,
+  "diagrams_successful": 0,
+  "diagram_types": [
+    "component",
+    "class",
+    "c4_context",
+    "activity",
+    "data_flow"
+  ],
+  "average_quality_score": 0.0,
+  "validation_results": {
+    "component": {
+      "validated": false,
+      "reason": "Generation failed",
+      "overall_score": 0,
+      "scores": {
+        "syntax": 0,
+        "completeness": 0,
+        "clarity": 0,
+        "accuracy": 0
+      },
+      "issues": [
+        "Generation failed"
+      ],
+      "recommendations": []
+    },
+    "class": {
+      "validated": false,
+      "reason": "Generation failed",
+      "overall_score": 0,
+      "scores": {
+        "syntax": 0,
+        "completeness": 0,
+        "clarity": 0,
+        "accuracy": 0
+      },
+      "issues": [
+        "Generation failed"
+      ],
+      "recommendations": []
+    },
+    "c4_context": {
+      "validated": false,
+      "reason": "Generation failed",
+      "overall_score": 0,
+      "scores": {
+        "syntax": 0,
+        "completeness": 0,
+        "clarity": 0,
+        "accuracy": 0
+      },
+      "issues": [
+        "Generation failed"
+      ],
+      "recommendations": []
+    },
+    "activity": {
+      "validated": false,
+      "reason": "Generation failed",
+      "overall_score": 0,
+      "scores": {
+        "syntax": 0,
+        "completeness": 0,
+        "clarity": 0,
+        "accuracy": 0
+      },
+      "issues": [
+        "Generation failed"
+      ],
+      "recommendations": []
+    },
+    "data_flow": {
+      "validated": false,
+      "reason": "Generation failed",
+      "overall_score": 0,
+      "scores": {
+        "syntax": 0,
+        "completeness": 0,
+        "clarity": 0,
+        "accuracy": 0
+      },
+      "issues": [
+        "Generation failed"
+      ],
+      "recommendations": []
+    }
+  },
+  "shared_entities": 0,
+  "diagram_connections": 0
+}

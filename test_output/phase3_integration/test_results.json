@@ -1,0 +1,74 @@
+{
+  "test_type": "phase3_integration",
+  "components_tested": [
+    "DiagramValidator",
+    "QualityReportGenerator",
+    "RelationshipMapper",
+    "InteractiveDocGenerator"
+  ],
+  "diagrams_tested": [
+    "component",
+    "class",
+    "sequence"
+  ],
+  "metrics": {
+    "average_quality_score": 85.41666666666667,
+    "shared_entities": 3,
+    "diagram_connections": 3,
+    "reports_generated": 4
+  },
+  "validation_results": {
+    "component": {
+      "diagram_type": "component",
+      "scores": {
+        "syntax": 100.0,
+        "completeness": 80,
+        "clarity": 70.0,
+        "accuracy": 75
+      },
+      "overall_score": 81.25,
+      "issues": [],
+      "recommendations": [
+        "Consider showing external dependencies"
+      ],
+      "validated": true
+    },
+    "class": {
+      "diagram_type": "class",
+      "scores": {
+        "syntax": 100.0,
+        "completeness": 80,
+        "clarity": 100.0,
+        "accuracy": 75
+      },
+      "overall_score": 88.75,
+      "issues": [],
+      "recommendations": [],
+      "validated": true
+    },
+    "sequence": {
+      "diagram_type": "sequence",
+      "scores": {
+        "syntax": 100.0,
+        "completeness": 80,
+        "clarity": 90.0,
+        "accuracy": 75
+      },
+      "overall_score": 86.25,
+      "issues": [],
+      "recommendations": [
+        "Consider adding activation boxes to show processing time"
+      ],
+      "validated": true
+    }
+  },
+  "relationship_map": {
+    "shared_entities_count": 3,
+    "connections_count": 3,
+    "diagrams_analyzed": [
+      "component",
+      "class",
+      "sequence"
+    ]
+  }
+}

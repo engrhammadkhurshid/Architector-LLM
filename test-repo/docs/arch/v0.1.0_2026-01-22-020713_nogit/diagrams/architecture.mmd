@@ -1,0 +1,16 @@
+```mermaid
+graph TD;
+    A[Codebase] --> B1[utils Module];
+    A --> B2[calculator Module];
+    A --> B3[main Module];
+    
+    B1 --> C1{log_error};
+    B1 --> C2{history dictionary};
+    
+    B2 --> C3{Calculator class};
+    B2 --> C4{ScientificCalculator class};
+    
+    B3 --> C5{main function};
+    C5 -- imports --> C3;
+    C5 -- imports --> C4;
+```

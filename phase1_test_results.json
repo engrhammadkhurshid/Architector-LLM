@@ -1,0 +1,175 @@
+{
+  "profile": {
+    "path": "/Users/hammadkhurshidchughtaii/Downloads/Architector LLM/test-repo",
+    "language": "python",
+    "languages": [
+      "python"
+    ],
+    "features": [
+      "oop"
+    ],
+    "frameworks": [],
+    "architectural_patterns": [],
+    "has_database": false,
+    "has_api": false,
+    "has_async": false,
+    "has_tests": false,
+    "has_deployment_configs": false,
+    "complexity": {
+      "total_files": 3,
+      "total_classes": 3,
+      "total_functions": 16,
+      "total_lines": 0,
+      "avg_dependencies": 10.33,
+      "coupling_score": 0.029,
+      "size_category": "tiny"
+    },
+    "project_type": "cli_tool",
+    "metadata": {
+      "total_files": 3,
+      "total_classes": 3,
+      "total_functions": 16,
+      "total_imports": 3,
+      "total_nodes": 33,
+      "total_edges": 31
+    }
+  },
+  "selected_diagrams": [
+    {
+      "type_id": "component",
+      "name": "Component Diagram",
+      "category": "structural",
+      "priority": "high",
+      "mermaid_type": "graph TD",
+      "description": "High-level system decomposition showing major components and dependencies",
+      "required_context": [
+        "modules",
+        "dependencies",
+        "external_systems"
+      ],
+      "reason": "\ud83d\udd34 HIGH PRIORITY: Essential for understanding system architecture and module relationships",
+      "scenarios": []
+    },
+    {
+      "type_id": "class",
+      "name": "Class Diagram",
+      "category": "structural",
+      "priority": "high",
+      "mermaid_type": "classDiagram",
+      "description": "Object-oriented structure showing classes, inheritance, and relationships",
+      "required_context": [
+        "classes",
+        "inheritance",
+        "relationships"
+      ],
+      "reason": "\ud83d\udd34 HIGH PRIORITY: OOP design with 3 classes requires class structure visualization",
+      "scenarios": []
+    },
+    {
+      "type_id": "c4_context",
+      "name": "C4 System Context Diagram",
+      "category": "architectural",
+      "priority": "medium",
+      "mermaid_type": "C4Context",
+      "description": "System boundaries, users, and external dependencies",
+      "required_context": [
+        "system_boundary",
+        "actors",
+        "external_systems"
+      ],
+      "reason": "\ud83d\udfe1 MEDIUM PRIORITY: cli_tool requires system context documentation",
+      "scenarios": []
+    },
+    {
+      "type_id": "activity",
+      "name": "Activity Diagram",
+      "category": "behavioral",
+      "priority": "medium",
+      "mermaid_type": "flowchart TD",
+      "description": "Workflow and business logic visualization",
+      "required_context": [
+        "workflows",
+        "algorithms",
+        "decision_points"
+      ],
+      "reason": "\ud83d\udfe1 MEDIUM PRIORITY: Complex business logic benefits from workflow visualization",
+      "scenarios": [
+        "Command Execution Flow"
+      ]
+    },
+    {
+      "type_id": "data_flow",
+      "name": "Data Flow Diagram",
+      "category": "data",
+      "priority": "medium",
+      "mermaid_type": "flowchart LR",
+      "description": "Data movement and transformation through the system",
+      "required_context": [
+        "data_sources",
+        "transformations",
+        "data_stores"
+      ],
+      "reason": "\ud83d\udfe1 MEDIUM PRIORITY: Data processing system benefits from data flow visualization",
+      "scenarios": []
+    }
+  ],
+  "report": {
+    "total_diagrams": 5,
+    "high_priority": 2,
+    "medium_priority": 3,
+    "categories": {
+      "structural": [
+        "Component Diagram",
+        "Class Diagram"
+      ],
+      "architectural": [
+        "C4 System Context Diagram"
+      ],
+      "behavioral": [
+        "Activity Diagram"
+      ],
+      "data": [
+        "Data Flow Diagram"
+      ]
+    },
+    "diagrams": [
+      {
+        "name": "Component Diagram",
+        "type": "component",
+        "priority": "high",
+        "reason": "\ud83d\udd34 HIGH PRIORITY: Essential for understanding system architecture and module relationships",
+        "scenarios": []
+      },
+      {
+        "name": "Class Diagram",
+        "type": "class",
+        "priority": "high",
+        "reason": "\ud83d\udd34 HIGH PRIORITY: OOP design with 3 classes requires class structure visualization",
+        "scenarios": []
+      },
+      {
+        "name": "C4 System Context Diagram",
+        "type": "c4_context",
+        "priority": "medium",
+        "reason": "\ud83d\udfe1 MEDIUM PRIORITY: cli_tool requires system context documentation",
+        "scenarios": []
+      },
+      {
+        "name": "Activity Diagram",
+        "type": "activity",
+        "priority": "medium",
+        "reason": "\ud83d\udfe1 MEDIUM PRIORITY: Complex business logic benefits from workflow visualization",
+        "scenarios": [
+          "Command Execution Flow"
+        ]
+      },
+      {
+        "name": "Data Flow Diagram",
+        "type": "data_flow",
+        "priority": "medium",
+        "reason": "\ud83d\udfe1 MEDIUM PRIORITY: Data processing system benefits from data flow visualization",
+        "scenarios": []
+      }
+    ]
+  }
+}

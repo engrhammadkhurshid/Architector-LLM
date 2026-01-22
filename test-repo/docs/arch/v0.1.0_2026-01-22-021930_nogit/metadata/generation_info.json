@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-01-22T02:19:30",
+  "processing_time": 223.04,
+  "files_analyzed": 3,
+  "total_classes": 3,
+  "total_functions": 16,
+  "llm_model": "deepseek-coder:6.7b",
+  "llm_tokens_used": 0,
+  "semantic_version": "0.1.0",
+  "codebase_path": "/Users/hammadkhurshidchughtaii/Downloads/Architector LLM/test-repo",
+  "git_hash": "nogit",
+  "diagrams_rendered": [
+    "PNG",
+    "SVG"
+  ]
+}

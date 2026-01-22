@@ -1,0 +1,152 @@
+{
+  "name": "architector-llm",
+  "displayName": "Architector-LLM: AI-Powered Architecture Documentation",
+  "description": "Automated software architecture documentation generation using Large Language Models. Research project from NUST Pakistan for paper: 'From Code to Architecture: Leveraging LLMs for Automated Software Design Documentation'",
+  "version": "2.0.3",
+  "icon": "icon.png",
+  "publisher": "EngHammadKhurshid",
+  "author": {
+    "name": "Engr. Hammad Khurshid",
+    "email": "engr.hammadkhurshid@gmail.com",
+    "url": "https://github.com/engrhammadkhurshid"
+  },
+  "contributors": [
+    {
+      "name": "Engr. Hammad Khurshid",
+      "email": "engr.hammadkhurshid@gmail.com",
+      "url": "https://github.com/engrhammadkhurshid"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/engrhammadkhurshid/architector-llm"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/engrhammadkhurshid/architector-llm#readme",
+  "bugs": {
+    "url": "https://github.com/engrhammadkhurshid/architector-llm/issues",
+    "email": "engr.hammadkhurshid@gmail.com"
+  },
+  "keywords": [
+    "architecture",
+    "documentation",
+    "llm",
+    "ai",
+    "deep-learning",
+    "code-analysis",
+    "mermaid",
+    "diagrams",
+    "software-architecture",
+    "automated-documentation",
+    "deepseek",
+    "ollama",
+    "openai",
+    "claude",
+    "research",
+    "nust-pakistan"
+  ],
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
+  },
+  "qna": "https://github.com/engrhammadkhurshid/architector-llm/discussions",
+  "sponsor": {
+    "url": "https://github.com/sponsors/engrhammadkhurshid"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Formatters",
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:architector-llm.generateDocs"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "architector-llm.generateDocs",
+        "title": "Generate Architecture Documentation",
+        "category": "Architector"
+      },
+      {
+        "command": "architector-llm.checkDependencies",
+        "title": "Check Dependencies",
+        "category": "Architector"
+      },
+      {
+        "command": "architector-llm.showAbout",
+        "title": "About Architector-LLM",
+        "category": "Architector"
+      },
+      {
+        "command": "architector-llm.showPrivacyPolicy",
+        "title": "View Privacy Policy",
+        "category": "Architector"
+      },
+      {
+        "command": "architector-llm.revokeConsent",
+        "title": "Withdraw Research Consent",
+        "category": "Architector"
+      },
+      {
+        "command": "architector-llm.updateDeveloperInfo",
+        "title": "Update Developer Information",
+        "category": "Architector"
+      },
+      {
+        "command": "architector-llm.exportAnalytics",
+        "title": "Export Analytics Data",
+        "category": "Architector"
+      }
+    ],
+    "configuration": {
+      "title": "Architector-LLM",
+      "properties": {
+        "architector.llmProvider": {
+          "type": "string",
+          "enum": ["ollama", "deepseek", "openai", "claude"],
+          "default": "ollama",
+          "description": "LLM provider to use for documentation generation",
+          "enumDescriptions": [
+            "Local LLM via Ollama (free, requires 3.8GB download)",
+            "DeepSeek API (fast, affordable, requires API key)",
+            "OpenAI GPT-4 (most capable, requires API key)",
+            "Anthropic Claude (high quality, requires API key)"
+          ]
+        },
+        "architector.outputDirectory": {
+          "type": "string",
+          "default": "docs/arch",
+          "description": "Base directory for generated documentation"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "start-backend": "cd backend && python src/main.py",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^18.x",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.54.0",
+    "typescript": "^5.3.2",
+    "@vscode/test-electron": "^2.3.8"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1"
+  }
+}

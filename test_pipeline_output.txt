@@ -1,0 +1,18 @@
+/Users/hammadkhurshidchughtaii/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Mermaid CLI not found. Install with: npm install -g @mermaid-js/mermaid-cli
+Pipeline failed: No source files found in codebase
+Traceback (most recent call last):
+  File "/Users/hammadkhurshidchughtaii/Downloads/Architector LLM/backend/src/pipeline.py", line 53, in generate
+    raise ValueError('No source files found in codebase')
+ValueError: No source files found in codebase
+Testing documentation generation for: /Users/hammadkhurshidchughtaii/Downloads/Architector LLM/test-repo
+============================================================
+
+Generating documentation...
+
+============================================================
+RESULT:
+============================================================
+❌ Failed: No source files found in codebase
+Processing time: 0.00s
