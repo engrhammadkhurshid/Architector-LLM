@@ -79,7 +79,7 @@ def generate_documentation():
             }), 400
         
         codebase_path = data['codebase_path']
-        semantic_version = data.get('semantic_version', '1.0.0')
+        semantic_version = data.get('semantic_version', None)  # Allow None for auto-detection
         
         if not os.path.exists(codebase_path):
             return jsonify({
@@ -88,8 +88,12 @@ def generate_documentation():
             }), 404
         
         logger.info(f'Starting documentation generation for: {codebase_path}')
+        if semantic_version:
+            logger.info(f'Using provided version: {semantic_version}')
+        else:
+            logger.info('Version will be auto-detected from project files')
         
-        # Execute the complete pipeline
+        # Execute the complete pipeline (version auto-detected if None)
         result = pipeline.generate(codebase_path, semantic_version)
         
         if result['status'] == 'success':

@@ -23,19 +23,53 @@ class CodebaseAnalyzer:
             'django': ['django', 'settings.py', 'manage.py', 'wsgi.py'],
             'flask': ['flask', 'Flask(', 'app.run('],
             'fastapi': ['fastapi', 'FastAPI(', '@app.get', '@app.post'],
+            'streamlit': ['streamlit', 'st.'],
             'sqlalchemy': ['sqlalchemy', 'declarative_base', 'Column', 'relationship'],
             'pytest': ['pytest', 'test_', 'conftest.py'],
+            'celery': ['celery', 'Celery(', '@app.task'],
             
             # JavaScript/TypeScript frameworks
             'react': ['react', 'React', 'useState', 'useEffect', 'jsx'],
             'vue': ['vue', 'Vue', '.vue', 'v-if', 'v-for'],
+            'angular': ['@angular', '@Component', '@NgModule'],
             'express': ['express', 'Express(', 'app.listen'],
             'nestjs': ['@nestjs', 'NestFactory', '@Controller', '@Injectable'],
-            'angular': ['@angular', '@Component', '@NgModule'],
+            'nextjs': ['next', 'Next', 'getStaticProps', 'getServerSideProps'],
+            'gatsby': ['gatsby', 'Gatsby', 'gatsby-config'],
+            'nuxt': ['nuxt', 'Nuxt', 'nuxt.config'],
+            'svelte': ['svelte', 'Svelte'],
             
-            # Testing
+            # PHP frameworks
+            'wordpress': ['wp-content', 'wp-includes', 'wp_enqueue', 'add_action', 'add_filter', 'Plugin Name:', 'Theme Name:'],
+            'laravel': ['laravel', 'Illuminate\\', 'artisan', 'routes/web.php'],
+            'symfony': ['symfony', 'Symfony\\', 'bin/console'],
+            'codeigniter': ['codeigniter', 'CodeIgniter\\', 'system/core'],
+            
+            # Java frameworks
+            'spring': ['springframework', '@SpringBootApplication', '@RestController', '@Service'],
+            'spring_boot': ['@SpringBootApplication', 'SpringApplication'],
+            'jakarta': ['jakarta.', 'javax.'],
+            'hibernate': ['hibernate', '@Entity', '@Table'],
+            
+            # C# frameworks
+            'aspnet': ['Microsoft.AspNetCore', 'ASP.NET', 'WebApplication.Create'],
+            'dotnet': ['.NET', 'Microsoft.Extensions'],
+            'entityframework': ['EntityFramework', 'DbContext'],
+            
+            # Go frameworks
+            'gin': ['gin-gonic', 'gin.Default'],
+            'echo': ['labstack/echo', 'echo.New'],
+            'fiber': ['gofiber', 'fiber.New'],
+            
+            # Ruby frameworks
+            'rails': ['rails', 'Rails', 'ActionController', 'ActiveRecord'],
+            'sinatra': ['sinatra', 'Sinatra'],
+            
+            # Testing frameworks
             'jest': ['jest', 'describe(', 'it(', 'test('],
             'mocha': ['mocha', 'describe(', 'it('],
+            'junit': ['junit', '@Test', 'org.junit'],
+            'rspec': ['rspec', 'RSpec', 'describe', 'it'],
         }
         
         self.architectural_patterns = {
@@ -296,27 +330,41 @@ class CodebaseAnalyzer:
         frameworks = profile.get('frameworks', [])
         has_api = profile.get('has_api', False)
         has_database = profile.get('has_database', False)
+        language = profile.get('language', 'unknown')
         
-        # Web applications
-        if any(fw in frameworks for fw in ['django', 'flask', 'fastapi', 'express', 'nestjs']):
+        # WordPress
+        if 'wordpress' in frameworks:
+            return 'wordpress_plugin' if 'Plugin Name:' in str(frameworks) else 'wordpress_theme'
+        
+        # Mobile frameworks
+        if 'react_native' in frameworks or 'flutter' in frameworks:
+            return 'mobile_application'
+        
+        # Web frameworks
+        if any(fw in frameworks for fw in ['django', 'flask', 'fastapi', 'express', 'nestjs', 'laravel', 'symfony', 'rails', 'spring_boot', 'aspnet']):
             if has_api:
                 return 'web_api'
             return 'web_application'
         
         # Frontend frameworks
-        if any(fw in frameworks for fw in ['react', 'vue', 'angular']):
+        if any(fw in frameworks for fw in ['react', 'vue', 'angular', 'svelte', 'nextjs', 'gatsby', 'nuxt']):
             return 'frontend_application'
+        
+        # Desktop applications (based on language/frameworks)
+        if language in ['csharp', 'java', 'cpp']:
+            if not has_api and not has_database:
+                return 'desktop_application'
         
         # CLI tools
         if profile.get('complexity', {}).get('total_files', 0) < 10 and not has_api:
             return 'cli_tool'
         
-        # Libraries
+        # Libraries/packages
         if not has_api and not profile.get('has_deployment_configs', False):
             return 'library'
         
         # Microservices
-        if profile.get('has_deployment_configs', False):
+        if profile.get('has_deployment_configs', False) or 'microservices' in profile.get('architectural_patterns', []):
             return 'microservice'
         
         return 'application'

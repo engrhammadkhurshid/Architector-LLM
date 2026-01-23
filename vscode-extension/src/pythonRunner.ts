@@ -26,7 +26,7 @@ export class PythonRunner {
     
     async runPipeline(
         projectPath: string,
-        version: string,
+        version: string | undefined,
         backendPath: string,
         progressCallback?: (message: string) => void,
         envVars?: Record<string, string>
@@ -36,7 +36,11 @@ export class PythonRunner {
             const extensionRoot = path.dirname(path.dirname(__dirname));
             const architectorScript = path.join(extensionRoot, 'architector.py');
             
-            this.outputChannel.appendLine(`Running: python3 ${architectorScript} ${projectPath} ${version}`);
+            // Build command args - only include version if provided
+            const args = version ? [architectorScript, projectPath, version] : [architectorScript, projectPath];
+            const versionStr = version || 'auto-detect';
+            
+            this.outputChannel.appendLine(`Running: python3 ${architectorScript} ${projectPath} ${versionStr}`);
             
             if (progressCallback) {
                 progressCallback('Starting analysis...');
@@ -48,7 +52,7 @@ export class PythonRunner {
             
             const childProcess = child_process.spawn(
                 'python3',
-                [architectorScript, projectPath, version],
+                args,
                 { env, cwd: extensionRoot }
             );
             

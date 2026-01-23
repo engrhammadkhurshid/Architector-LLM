@@ -14,6 +14,7 @@ from llm.prompt_curator import PromptCurator
 from diagram.renderer import DiagramRenderer
 from output.organizer import OutputOrganizer
 from analyzer.codebase_analyzer import CodebaseAnalyzer
+from analyzer.version_detector import VersionDetector
 from diagram.diagram_selector import DiagramSelector
 from diagram.multi_diagram_generator import MultiDiagramGenerator, LLMServiceAdapter
 from diagram.relationship_mapper import RelationshipMapper
@@ -31,9 +32,10 @@ class DocumentationPipeline:
     def __init__(self):
         self.parser = CodeParser()
         self.graph_builder = DependencyGraphBuilder()
+        self.version_detector = VersionDetector()
         
         # Select LLM client based on environment variable
-        llm_provider = os.getenv('LLM_PROVIDER', 'deepseek').lower()
+        llm_provider = os.getenv('LLM_PROVIDER', 'ollama').lower()
         if llm_provider == 'ollama':
             self.llm_client = OllamaClient()
             logger.info('Using Ollama local LLM')
@@ -61,13 +63,13 @@ class DocumentationPipeline:
         
         logger.info('Documentation pipeline initialized with Phase 3: Quality validation, relationships, and interactive docs')
     
-    def generate(self, codebase_path: str, semantic_version: str = '1.0.0') -> Dict[str, Any]:
+    def generate(self, codebase_path: str, semantic_version: str = None) -> Dict[str, Any]:
         """
         Execute the complete documentation generation pipeline
         
         Args:
             codebase_path: Path to the codebase to analyze
-            semantic_version: Semantic version for output directory
+            semantic_version: Semantic version for output directory (optional, auto-detected if None)
             
         Returns:
             Results dictionary with output paths and metrics
@@ -76,6 +78,19 @@ class DocumentationPipeline:
         logger.info(f'Starting documentation generation for: {codebase_path}')
         
         try:
+            # Auto-detect version if not provided
+            if not semantic_version:
+                logger.info('Auto-detecting project version...')
+                version_info = self.version_detector.detect(codebase_path)
+                if version_info['version']:
+                    semantic_version = version_info['version']
+                    logger.info(f'Detected version {semantic_version} from {version_info["source"]} ({version_info["language"]})')
+                else:
+                    semantic_version = '1.0.0'
+                    logger.warning('No version detected, using default: 1.0.0')
+            else:
+                logger.info(f'Using provided version: {semantic_version}')
+            
             # Stage 1: Parse codebase
             logger.info('Stage 1: Parsing codebase...')
             parsed_files = self.parser.parse_directory(codebase_path)

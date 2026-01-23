@@ -216,20 +216,30 @@ async function generateDocumentation(context: vscode.ExtensionContext) {
         outputChannel.appendLine('✅ Using cached dependency check\n');
     }
     
-    // Ask for semantic version
+    // Ask for semantic version (with auto-detect option)
     const version = await vscode.window.showInputBox({
-        prompt: 'Enter semantic version for documentation (e.g., 1.0.0)',
-        value: '1.0.0',
+        prompt: 'Enter semantic version for documentation (leave empty to auto-detect from project files)',
+        placeHolder: 'e.g., 1.0.0, 2.3.1, or leave empty for auto-detection',
+        value: '',
         validateInput: (value) => {
-            if (!/^\d+\.\d+\.\d+$/.test(value)) {
-                return 'Please enter a valid semantic version (e.g., 1.0.0)';
+            if (value && !/^\d+\.\d+\.\d+(-[\w.]+)?(\+[\w.]+)?$/.test(value)) {
+                return 'Please enter a valid semantic version (e.g., 1.0.0) or leave empty for auto-detection';
             }
             return null;
         }
     });
     
-    if (!version) {
-        return; // User cancelled
+    if (version === undefined) {
+        return; // User cancelled (ESC or close button)
+    }
+    
+    // Empty string means auto-detect, which is valid
+    const versionToUse = version.trim() || undefined;
+    
+    if (versionToUse) {
+        outputChannel.appendLine(`📦 Using version: ${versionToUse}\n`);
+    } else {
+        outputChannel.appendLine('🔍 Version will be auto-detected from project files (package.json, pyproject.toml, etc.)\n');
     }
     
     // Show progress panel
@@ -250,7 +260,7 @@ async function generateDocumentation(context: vscode.ExtensionContext) {
         
         const result = await runner.runPipeline(
             projectPath,
-            version,
+            versionToUse,  // Can be undefined for auto-detection
             backendPath,
             (message) => {
                 progressPanel.updateProgress(message);

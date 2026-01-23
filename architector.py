@@ -20,16 +20,20 @@ def main():
         print('\nExamples:')
         print('  python3 architector.py ~/projects/my-app')
         print('  python3 architector.py ~/projects/my-app 2.0.0')
+        print('  python3 architector.py ~/projects/my-app  # auto-detects version')
         print('\nOr use the test script:')
         print('  python3 test_real_project.py')
         sys.exit(1)
     
     codebase = sys.argv[1]
-    version = sys.argv[2] if len(sys.argv) > 2 else '1.0.0'
+    version = sys.argv[2] if len(sys.argv) > 2 else None  # None means auto-detect
     
     print(f'🚀 Architector-LLM')
     print(f'   Analyzing: {codebase}')
-    print(f'   Version: {version}')
+    if version:
+        print(f'   Version: {version}')
+    else:
+        print(f'   Version: Auto-detect from project files')
     print()
     
     pipeline = DocumentationPipeline()
