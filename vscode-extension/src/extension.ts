@@ -15,6 +15,7 @@ import { AnalyticsManager } from './analytics/telemetry';
 
 let statusBarItem: vscode.StatusBarItem;
 let outputChannel: vscode.OutputChannel;
+let dependenciesChecked: boolean = false; // Cache dependency check for session
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Architector-LLM extension is now active');
@@ -108,12 +109,46 @@ export function activate(context: vscode.ExtensionContext) {
         outputChannel
     );
     
-    // Run setup wizard on first launch
-    const setupWizard = new SetupWizard(context);
-    setupWizard.run().then(() => {
-        // After setup, show quick tip
-        setTimeout(() => setupWizard.showQuickTip(), 2000);
-    });
+    // First-run detection: Show welcome only on FIRST activation
+    // Run asynchronously to not block extension activation
+    (async () => {
+        const hasSeenWelcome = context.globalState.get('hasSeenWelcome', false);
+        const setupCompleted = context.globalState.get('setupCompleted', false);
+        
+        if (!hasSeenWelcome) {
+            // Mark as seen immediately to prevent showing again
+            await context.globalState.update('hasSeenWelcome', true);
+            
+            // Show welcome notification with setup action
+            const action = await vscode.window.showInformationMessage(
+                '🎉 Welcome to Architector-LLM! Let\'s set up your AI-powered documentation generator.',
+                'Setup Now',
+                'Later'
+            );
+            
+            if (action === 'Setup Now') {
+                const setupWizard = new SetupWizard(context);
+                await setupWizard.run();
+                // Show quick tip after successful setup
+                if (context.globalState.get('setupCompleted', false)) {
+                    setTimeout(() => setupWizard.showQuickTip(), 2000);
+                }
+            } else {
+                // User chose "Later" - show reminder
+                vscode.window.showInformationMessage(
+                    'Setup incomplete. Run "Architector: Run Setup Wizard" from Command Palette (Cmd+Shift+P) when ready.',
+                    'OK'
+                );
+            }
+        } else if (!setupCompleted) {
+            // Not first run, but setup not completed - show subtle reminder in status bar
+            const reminder = vscode.window.setStatusBarMessage(
+                '$(warning) Architector: Setup incomplete. Click "Architector" or run Setup Wizard',
+                10000
+            );
+            context.subscriptions.push(reminder);
+        }
+    })();
 }
 
 async function generateDocumentation(context: vscode.ExtensionContext) {
@@ -158,19 +193,27 @@ async function generateDocumentation(context: vscode.ExtensionContext) {
         }
     }
     
-    // Check dependencies
-    const checker = new DependencyChecker(outputChannel);
-    const depsOk = await checker.checkAll();
-    
-    if (!depsOk) {
-        const install = await vscode.window.showErrorMessage(
-            'Some dependencies are missing. Would you like to see the installation guide?',
-            'Yes', 'No'
-        );
-        if (install === 'Yes') {
-            await vscode.commands.executeCommand('architector-llm.checkDependencies');
+    // Check dependencies (cached after first check in session)
+    if (!dependenciesChecked) {
+        const checker = new DependencyChecker(outputChannel);
+        const depsOk = await checker.checkAll();
+        
+        if (!depsOk) {
+            const install = await vscode.window.showErrorMessage(
+                'Some dependencies are missing. Would you like to see the installation guide?',
+                'Yes', 'No'
+            );
+            if (install === 'Yes') {
+                await vscode.commands.executeCommand('architector-llm.checkDependencies');
+            }
+            return;
         }
-        return;
+        
+        // Cache successful check for this session
+        dependenciesChecked = true;
+        outputChannel.appendLine('✅ Dependencies cached for session\n');
+    } else {
+        outputChannel.appendLine('✅ Using cached dependency check\n');
     }
     
     // Ask for semantic version

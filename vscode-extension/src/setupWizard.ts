@@ -21,13 +21,23 @@ export class SetupWizard {
         const proceed = await vscode.window.showInformationMessage(
             `🎉 Welcome to Architector-LLM!
 
-Let's set up your documentation generator in 2 minutes.`,
+Let's set up your documentation generator in 2 minutes.
+
+This wizard has 3 simple steps:
+1️⃣ Choose LLM provider
+2️⃣ Configure API/Ollama
+3️⃣ Research participation (optional)`,
             { modal: true },
             'Get Started',
             'Later'
         );
         
         if (proceed !== 'Get Started') {
+            // User clicked "Later" - show helpful reminder
+            await vscode.window.showInformationMessage(
+                '⚠️ Setup incomplete. You can run setup later from Command Palette:\n• Press Cmd+Shift+P (Mac) or Ctrl+Shift+P (Windows/Linux)\n• Type "Architector: Run Setup Wizard"',
+                'Got it'
+            );
             return;
         }
         
@@ -55,10 +65,15 @@ Let's set up your documentation generator in 2 minutes.`,
         // Mark setup as complete
         await this.context.globalState.update('setupCompleted', true);
         
-        vscode.window.showInformationMessage(
-            '✅ Setup complete! Click "Architector" in the status bar to generate documentation.',
-            'Got it!'
+        const action = await vscode.window.showInformationMessage(
+            '✅ Setup complete! Ready to generate documentation.\n\n📚 Click "Architector" button in status bar (bottom-right) to start.',
+            'Try Now',
+            'Later'
         );
+        
+        if (action === 'Try Now') {
+            vscode.commands.executeCommand('architector-llm.generateDocs');
+        }
     }
     
     private async selectLLMProvider(): Promise<string | undefined> {
@@ -88,9 +103,10 @@ Let's set up your documentation generator in 2 minutes.`,
         
         const choice = await vscode.window.showQuickPick(options, {
             placeHolder: ollamaDetected 
-                ? '✨ Ollama detected! Choose your preferred option or use the detected installation'
-                : 'Choose how you want to run the LLM',
-            ignoreFocusOut: true
+                ? '[Step 1/3] ✨ Ollama detected! Choose your preferred option'
+                : '[Step 1/3] Choose how you want to run the LLM',
+            ignoreFocusOut: true,
+            title: 'Architector Setup: LLM Provider'
         });
         
         if (!choice) return undefined;
@@ -120,8 +136,9 @@ Let's set up your documentation generator in 2 minutes.`,
                 value: 'claude'
             }
         ], {
-            placeHolder: 'Select your API provider',
-            ignoreFocusOut: true
+            placeHolder: '[Step 2/3] Select your cloud API provider',
+            ignoreFocusOut: true,
+            title: 'Architector Setup: API Provider'
         });
         
         return provider?.value;
