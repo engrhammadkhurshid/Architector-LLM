@@ -109,44 +109,38 @@ export function activate(context: vscode.ExtensionContext) {
         outputChannel
     );
     
-    // First-run detection: Show welcome only on FIRST activation
+    // First-run detection: AUTOMATICALLY run setup wizard on first activation
+    // This is MANDATORY to collect developer info and project info before any documentation generation
     // Run asynchronously to not block extension activation
     (async () => {
-        const hasSeenWelcome = context.globalState.get('hasSeenWelcome', false);
         const setupCompleted = context.globalState.get('setupCompleted', false);
         
-        if (!hasSeenWelcome) {
-            // Mark as seen immediately to prevent showing again
-            await context.globalState.update('hasSeenWelcome', true);
+        if (!setupCompleted) {
+            // FIRST RUN: Automatically start setup wizard (not just show notification)
+            outputChannel.appendLine('🎉 First run detected - Starting mandatory setup wizard...');
             
-            // Show welcome notification with setup action
-            const action = await vscode.window.showInformationMessage(
-                '🎉 Welcome to Architector-LLM! Let\'s set up your AI-powered documentation generator.',
-                'Setup Now',
-                'Later'
-            );
-            
-            if (action === 'Setup Now') {
+            // Small delay to let VS Code finish activation
+            setTimeout(async () => {
                 const setupWizard = new SetupWizard(context);
                 await setupWizard.run();
+                
                 // Show quick tip after successful setup
                 if (context.globalState.get('setupCompleted', false)) {
+                    outputChannel.appendLine('✅ Setup completed successfully!');
                     setTimeout(() => setupWizard.showQuickTip(), 2000);
+                } else {
+                    // Setup was cancelled/incomplete
+                    outputChannel.appendLine('⚠️ Setup incomplete - you must complete setup before generating documentation');
+                    vscode.window.showWarningMessage(
+                        '⚠️ Architector setup is incomplete. Please complete setup to generate documentation.',
+                        'Complete Setup'
+                    ).then(action => {
+                        if (action === 'Complete Setup') {
+                            vscode.commands.executeCommand('architector-llm.runSetupWizard');
+                        }
+                    });
                 }
-            } else {
-                // User chose "Later" - show reminder
-                vscode.window.showInformationMessage(
-                    'Setup incomplete. Run "Architector: Run Setup Wizard" from Command Palette (Cmd+Shift+P) when ready.',
-                    'OK'
-                );
-            }
-        } else if (!setupCompleted) {
-            // Not first run, but setup not completed - show subtle reminder in status bar
-            const reminder = vscode.window.setStatusBarMessage(
-                '$(warning) Architector: Setup incomplete. Click "Architector" or run Setup Wizard',
-                10000
-            );
-            context.subscriptions.push(reminder);
+            }, 1000); // 1 second delay for smooth activation
         }
     })();
 }
@@ -154,6 +148,37 @@ export function activate(context: vscode.ExtensionContext) {
 async function generateDocumentation(context: vscode.ExtensionContext) {
     outputChannel.show();
     outputChannel.appendLine('Starting documentation generation...');
+    
+    // CRITICAL: Check if setup is completed FIRST before any generation
+    const setupCompleted = context.globalState.get('setupCompleted', false);
+    if (!setupCompleted) {
+        outputChannel.appendLine('❌ Setup wizard has not been completed yet');
+        const action = await vscode.window.showWarningMessage(
+            '⚠️ Setup Required: Please complete the setup wizard first to configure Architector-LLM and provide developer information for research.',
+            { modal: true },
+            'Complete Setup Now',
+            'Cancel'
+        );
+        
+        if (action === 'Complete Setup Now') {
+            const setupWizard = new SetupWizard(context);
+            await setupWizard.run();
+            
+            // Check if setup was actually completed
+            const nowCompleted = context.globalState.get('setupCompleted', false);
+            if (!nowCompleted) {
+                outputChannel.appendLine('❌ Setup was not completed - cannot generate documentation');
+                vscode.window.showErrorMessage('Setup must be completed to generate documentation');
+                return;
+            }
+            
+            // Setup completed, continue with generation
+            outputChannel.appendLine('✅ Setup completed - proceeding with documentation generation');
+        } else {
+            outputChannel.appendLine('❌ User cancelled - setup required before generation');
+            return;
+        }
+    }
     
     // Track event
     const analytics = new AnalyticsManager(context);
@@ -171,10 +196,11 @@ async function generateDocumentation(context: vscode.ExtensionContext) {
     const projectPath = workspaceFolder.uri.fsPath;
     outputChannel.appendLine(`Project path: ${projectPath}`);
     
-    // Check if LLM provider is configured
+    // Check if LLM provider is configured (should always be true after setup)
     const llmProvider = vscode.workspace.getConfiguration('architector').get<string>('llmProvider');
     if (!llmProvider) {
-        // Run setup wizard if not configured
+        // This should not happen after setup, but just in case
+        outputChannel.appendLine('⚠️ LLM provider not configured - running setup wizard');
         const setupWizard = new SetupWizard(context);
         await setupWizard.run();
         return;
