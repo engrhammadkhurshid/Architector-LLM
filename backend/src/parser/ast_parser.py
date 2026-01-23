@@ -8,7 +8,7 @@ import os
 import logging
 from pathlib import Path
 from typing import Dict, List, Any, Optional
-from tree_sitter import Parser, Node
+from tree_sitter import Language, Parser, Node
 import tree_sitter_python as tspython
 import tree_sitter_javascript as tsjavascript
 import tree_sitter_typescript as tstypescript
@@ -31,62 +31,51 @@ class CodeParser:
     
     def __init__(self):
         # Initialize all parsers - all languages supported by default
-        # Tree-sitter 0.22+ uses parser.set_language() instead of Language wrapper
+        # Tree-sitter 0.23+ uses Language() wrapper for PyCapsule objects
         self.parsers = {}
         
         # Python
-        python_parser = Parser()
-        python_parser.set_language(tspython.language())
+        python_parser = Parser(Language(tspython.language()))
         self.parsers['python'] = python_parser
         
         # JavaScript
-        js_parser = Parser()
-        js_parser.set_language(tsjavascript.language())
+        js_parser = Parser(Language(tsjavascript.language()))
         self.parsers['javascript'] = js_parser
         
         # TypeScript
-        ts_parser = Parser()
-        ts_parser.set_language(tstypescript.language_typescript())
+        ts_parser = Parser(Language(tstypescript.language_typescript()))
         self.parsers['typescript'] = ts_parser
         
         # PHP
-        php_parser = Parser()
-        php_parser.set_language(tsphp.language_php())
+        php_parser = Parser(Language(tsphp.language_php()))
         self.parsers['php'] = php_parser
         
         # Java
-        java_parser = Parser()
-        java_parser.set_language(tsjava.language())
+        java_parser = Parser(Language(tsjava.language()))
         self.parsers['java'] = java_parser
         
         # C
-        c_parser = Parser()
-        c_parser.set_language(tsc.language())
+        c_parser = Parser(Language(tsc.language()))
         self.parsers['c'] = c_parser
         
         # C++
-        cpp_parser = Parser()
-        cpp_parser.set_language(tscpp.language())
+        cpp_parser = Parser(Language(tscpp.language()))
         self.parsers['cpp'] = cpp_parser
         
         # C#
-        csharp_parser = Parser()
-        csharp_parser.set_language(tscsharp.language())
+        csharp_parser = Parser(Language(tscsharp.language()))
         self.parsers['csharp'] = csharp_parser
         
         # Go
-        go_parser = Parser()
-        go_parser.set_language(tsgo.language())
+        go_parser = Parser(Language(tsgo.language()))
         self.parsers['go'] = go_parser
         
         # Rust
-        rust_parser = Parser()
-        rust_parser.set_language(tsrust.language())
+        rust_parser = Parser(Language(tsrust.language()))
         self.parsers['rust'] = rust_parser
         
         # Ruby
-        ruby_parser = Parser()
-        ruby_parser.set_language(tsruby.language())
+        ruby_parser = Parser(Language(tsruby.language()))
         self.parsers['ruby'] = ruby_parser
         
         logger.info('Initialized parsers for: Python, JavaScript, TypeScript, PHP, Java, C, C++, C#, Go, Rust, Ruby')

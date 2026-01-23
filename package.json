@@ -2,7 +2,7 @@
   "name": "architector-llm",
   "displayName": "Architector-LLM: AI-Powered Architecture Documentation",
   "description": "Automated software architecture documentation generation using Large Language Models. Research project from NUST Pakistan for paper: 'From Code to Architecture: Leveraging LLMs for Automated Software Design Documentation'",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "icon": "icon.png",
   "publisher": "EngHammadKhurshid",
   "author": {
