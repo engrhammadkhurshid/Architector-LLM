@@ -2,7 +2,7 @@
   "name": "architector-llm",
   "displayName": "Architector-LLM: AI-Powered Architecture Documentation",
   "description": "Automated software architecture documentation generation using Large Language Models. Research project from NUST Pakistan for paper: 'From Code to Architecture: Leveraging LLMs for Automated Software Design Documentation'",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "icon": "icon.png",
   "publisher": "EngHammadKhurshid",
   "author": {
@@ -62,7 +62,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:architector-llm.generateDocs"
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -101,6 +101,11 @@
         "command": "architector-llm.exportAnalytics",
         "title": "Export Analytics Data",
         "category": "Architector"
+      },
+      {
+        "command": "architector-llm.runSetupWizard",
+        "title": "Run Setup Wizard",
+        "category": "Architector"
       }
     ],
     "configuration": {
@@ -122,19 +127,31 @@
           "type": "string",
           "default": "docs/arch",
           "description": "Base directory for generated documentation"
+        },
+        "architector.ollamaUrl": {
+          "type": "string",
+          "default": "http://localhost:11434",
+          "description": "URL for local Ollama instance"
+        },
+        "architector.ollamaModel": {
+          "type": "string",
+          "default": "deepseek-coder:6.7b",
+          "description": "Ollama model to use for documentation generation"
         }
       }
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile",
+    "vscode:prepublish": "npm run package-extension",
+    "compile": "webpack --mode development",
+    "watch": "webpack --mode development --watch",
+    "package-extension": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
-    "start-backend": "cd backend && python src/main.py",
-    "package": "vsce package"
+    "start-backend": "cd backend && python src/main.py"
   },
   "devDependencies": {
     "@types/node": "^18.x",
@@ -143,7 +160,10 @@
     "@typescript-eslint/parser": "^6.13.0",
     "eslint": "^8.54.0",
     "typescript": "^5.3.2",
-    "@vscode/test-electron": "^2.3.8"
+    "@vscode/test-electron": "^2.3.8",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "ts-loader": "^9.5.1"
   },
   "dependencies": {
     "axios": "^1.6.2",

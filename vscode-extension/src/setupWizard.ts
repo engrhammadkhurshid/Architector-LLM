@@ -19,7 +19,9 @@ export class SetupWizard {
         
         // Welcome screen
         const proceed = await vscode.window.showInformationMessage(
-            '🎉 Welcome to Architector-LLM!\\n\\nLet\'s set up your documentation generator in 2 minutes.',
+            `🎉 Welcome to Architector-LLM!
+
+Let's set up your documentation generator in 2 minutes.`,
             { modal: true },
             'Get Started',
             'Later'
@@ -150,7 +152,11 @@ export class SetupWizard {
         const info = providerInfo[provider as keyof typeof providerInfo];
         
         const getKey = await vscode.window.showInformationMessage(
-            `📋 Get your ${info.name} API key:\\n\\n1. Visit: ${info.url}\\n2. Create or copy your API key\\n3. Paste it in the next step`,
+            `📋 Get your ${info.name} API key:
+
+1. Visit: ${info.url}
+2. Create or copy your API key
+3. Paste it in the next step`,
             { modal: true },
             'Open URL',
             'I have my key'
@@ -207,7 +213,9 @@ export class SetupWizard {
         
         if (ollamaRunning && modelAvailable) {
             vscode.window.showInformationMessage(
-                '✅ Ollama is already set up and ready!\\n\\nModel: deepseek-coder:6.7b is available.',
+                `✅ Ollama is already set up and ready!
+
+Model: deepseek-coder:6.7b is available.`,
                 'Got it!'
             );
             return;
@@ -215,8 +223,9 @@ export class SetupWizard {
         
         if (ollamaRunning && !modelAvailable) {
             const download = await vscode.window.showInformationMessage(
-                '⚠️  Ollama is running, but deepseek-coder model is missing.\\n\\n' +
-                'Download the model now (~3.8GB)?',
+                `⚠️  Ollama is running, but deepseek-coder model is missing.
+
+Download the model now (~3.8GB)?`,
                 { modal: true },
                 'Download Model',
                 'Manual Setup'
@@ -224,8 +233,9 @@ export class SetupWizard {
             
             if (download === 'Download Model') {
                 vscode.window.showInformationMessage(
-                    'Run this command in your terminal:\\n\\n' +
-                    'ollama pull deepseek-coder:6.7b',
+                    `Run this command in your terminal:
+
+ollama pull deepseek-coder:6.7b`,
                     'Copy Command'
                 ).then(result => {
                     if (result === 'Copy Command') {
@@ -237,11 +247,13 @@ export class SetupWizard {
         }
         
         const result = await vscode.window.showInformationMessage(
-            '📦 Local LLM Setup Required:\\n\\n' +
-            '1. Install Ollama: https://ollama.ai\\n' +
-            '2. Run: ollama pull deepseek-coder:6.7b\\n' +
-            '3. Start: ollama serve\\n\\n' +
-            'This is a one-time setup (~3.8GB download).',
+            `📦 Local LLM Setup Required:
+
+1. Install Ollama: https://ollama.ai
+2. Run: ollama pull deepseek-coder:6.7b
+3. Start: ollama serve
+
+This is a one-time setup (~3.8GB download).`,
             { modal: true },
             'Open Ollama Website',
             'Check Dependencies'
@@ -258,11 +270,12 @@ export class SetupWizard {
         const devInfoManager = new DeveloperInfoManager(this.context);
         
         const participate = await vscode.window.showInformationMessage(
-            '📊 Research Study Participation\\n\\n' +
-            'This extension is part of research at NUST Pakistan. ' +
-            'Would you like to help improve this tool by sharing anonymous usage data?\\n\\n' +
-            '✅ What we collect: Usage stats, performance metrics\\n' +
-            '❌ What we DON\'T collect: Your code or sensitive data',
+            `📊 Research Study Participation
+
+This extension is part of research at NUST Pakistan. Would you like to help improve this tool by sharing anonymous usage data?
+
+✅ What we collect: Usage stats, performance metrics
+❌ What we DON'T collect: Your code or sensitive data`,
             { modal: true },
             'Learn More',
             'Yes, Help Research',

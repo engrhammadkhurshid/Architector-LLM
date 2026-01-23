@@ -3,7 +3,10 @@
 test-*/**
 *.log
 .env
-.env.*
+.env.local
+.env.development
+.env.production
+!.env.example
 node_modules/**
 out/test/**
 src/**
@@ -20,3 +23,11 @@ debug_*.py
 *.md
 !README.md
 !CHANGELOG.md
+webpack.config.js
+tsconfig.json
+.eslintrc.json
+vscode-extension/**
+!backend/**
+!architector.py
+!icon.png
+!.env.example

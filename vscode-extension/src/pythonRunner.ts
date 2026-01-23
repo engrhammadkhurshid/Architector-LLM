@@ -32,9 +32,9 @@ export class PythonRunner {
         envVars?: Record<string, string>
     ): Promise<PipelineResult> {
         return new Promise((resolve, reject) => {
-            // Find architector.py in the parent directory of vscode-extension
-            const extensionParent = path.dirname(path.dirname(__dirname));
-            const architectorScript = path.join(extensionParent, 'architector.py');
+            // Find architector.py in the extension directory
+            const extensionRoot = path.dirname(path.dirname(__dirname));
+            const architectorScript = path.join(extensionRoot, 'architector.py');
             
             this.outputChannel.appendLine(`Running: python3 ${architectorScript} ${projectPath} ${version}`);
             
@@ -49,7 +49,7 @@ export class PythonRunner {
             const childProcess = child_process.spawn(
                 'python3',
                 [architectorScript, projectPath, version],
-                { env, cwd: extensionParent }
+                { env, cwd: extensionRoot }
             );
             
             let output = '';

@@ -86,6 +86,16 @@ export function activate(context: vscode.ExtensionContext) {
         }
     );
     
+    const runSetupWizardCommand = vscode.commands.registerCommand(
+        'architector-llm.runSetupWizard',
+        async () => {
+            // Reset setup state to allow re-running
+            await context.globalState.update('setupCompleted', false);
+            const setupWizard = new SetupWizard(context);
+            await setupWizard.run();
+        }
+    );
+    
     context.subscriptions.push(
         generateDocsCommand,
         checkDependenciesCommand,
@@ -94,6 +104,7 @@ export function activate(context: vscode.ExtensionContext) {
         revokeConsentCommand,
         updateDeveloperInfoCommand,
         exportAnalyticsCommand,
+        runSetupWizardCommand,
         outputChannel
     );
     
@@ -192,7 +203,7 @@ async function generateDocumentation(context: vscode.ExtensionContext) {
         // Run Python pipeline
         const runner = new PythonRunner(outputChannel);
         const extensionPath = context.extensionPath;
-        const backendPath = path.join(path.dirname(extensionPath), 'backend', 'src');
+        const backendPath = path.join(extensionPath, 'backend', 'src');
         
         const result = await runner.runPipeline(
             projectPath,
