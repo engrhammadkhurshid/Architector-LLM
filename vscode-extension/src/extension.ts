@@ -25,9 +25,18 @@ export function activate(context: vscode.ExtensionContext) {
     
     // Create status bar item
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-    statusBarItem.text = "$(book) Architector";
-    statusBarItem.tooltip = "Generate Architecture Documentation";
-    statusBarItem.command = 'architector-llm.generateDocs';
+    
+    // Check setup status to show appropriate button
+    const setupCompleted = context.globalState.get('setupCompleted', false);
+    if (!setupCompleted) {
+        statusBarItem.text = "$(gear) Setup Architector";
+        statusBarItem.tooltip = "Complete Setup Wizard (Required)";
+        statusBarItem.command = 'architector-llm.runSetupWizard';
+    } else {
+        statusBarItem.text = "$(book) Architector";
+        statusBarItem.tooltip = "Generate Architecture Documentation";
+        statusBarItem.command = 'architector-llm.generateDocs';
+    }
     statusBarItem.show();
     context.subscriptions.push(statusBarItem);
     
@@ -90,10 +99,16 @@ export function activate(context: vscode.ExtensionContext) {
     const runSetupWizardCommand = vscode.commands.registerCommand(
         'architector-llm.runSetupWizard',
         async () => {
-            // Reset setup state to allow re-running
-            await context.globalState.update('setupCompleted', false);
             const setupWizard = new SetupWizard(context);
             await setupWizard.run();
+            
+            // Update status bar after setup completes
+            const nowCompleted = context.globalState.get('setupCompleted', false);
+            if (nowCompleted) {
+                statusBarItem.text = "$(book) Architector";
+                statusBarItem.tooltip = "Generate Architecture Documentation";
+                statusBarItem.command = 'architector-llm.generateDocs';
+            }
         }
     );
     
@@ -124,23 +139,23 @@ export function activate(context: vscode.ExtensionContext) {
                 const setupWizard = new SetupWizard(context);
                 await setupWizard.run();
                 
-                // Show quick tip after successful setup
-                if (context.globalState.get('setupCompleted', false)) {
+                // Update status bar after setup
+                const nowCompleted = context.globalState.get('setupCompleted', false);
+                if (nowCompleted) {
                     outputChannel.appendLine('✅ Setup completed successfully!');
+                    statusBarItem.text = "$(book) Architector";
+                    statusBarItem.tooltip = "Generate Architecture Documentation";
+                    statusBarItem.command = 'architector-llm.generateDocs';
                     setTimeout(() => setupWizard.showQuickTip(), 2000);
                 } else {
-                    // Setup was cancelled/incomplete
+                    // Setup was cancelled/incomplete - keep setup button
                     outputChannel.appendLine('⚠️ Setup incomplete - you must complete setup before generating documentation');
                     vscode.window.showWarningMessage(
-                        '⚠️ Architector setup is incomplete. Please complete setup to generate documentation.',
-                        'Complete Setup'
-                    ).then(action => {
-                        if (action === 'Complete Setup') {
-                            vscode.commands.executeCommand('architector-llm.runSetupWizard');
-                        }
-                    });
+                        '⚠️ Architector setup is incomplete. Click "Setup Architector" button in status bar to complete setup.',
+                        'OK'
+                    );
                 }
-            }, 1000); // 1 second delay for smooth activation
+            }, 1500); // 1.5 second delay for smooth activation
         }
     })();
 }
@@ -153,31 +168,27 @@ async function generateDocumentation(context: vscode.ExtensionContext) {
     const setupCompleted = context.globalState.get('setupCompleted', false);
     if (!setupCompleted) {
         outputChannel.appendLine('❌ Setup wizard has not been completed yet');
-        const action = await vscode.window.showWarningMessage(
-            '⚠️ Setup Required: Please complete the setup wizard first to configure Architector-LLM and provide developer information for research.',
-            { modal: true },
-            'Complete Setup Now',
-            'Cancel'
-        );
         
-        if (action === 'Complete Setup Now') {
-            const setupWizard = new SetupWizard(context);
-            await setupWizard.run();
-            
-            // Check if setup was actually completed
-            const nowCompleted = context.globalState.get('setupCompleted', false);
-            if (!nowCompleted) {
-                outputChannel.appendLine('❌ Setup was not completed - cannot generate documentation');
-                vscode.window.showErrorMessage('Setup must be completed to generate documentation');
-                return;
-            }
-            
-            // Setup completed, continue with generation
-            outputChannel.appendLine('✅ Setup completed - proceeding with documentation generation');
-        } else {
-            outputChannel.appendLine('❌ User cancelled - setup required before generation');
+        // Directly run setup wizard (no confirmation dialog)
+        outputChannel.appendLine('▶️  Running setup wizard...');
+        const setupWizard = new SetupWizard(context);
+        await setupWizard.run();
+        
+        // Check if setup was actually completed
+        const nowCompleted = context.globalState.get('setupCompleted', false);
+        if (!nowCompleted) {
+            outputChannel.appendLine('❌ Setup was not completed - cannot generate documentation');
+            vscode.window.showErrorMessage('Setup must be completed to generate documentation. Please click the status bar button to complete setup.');
             return;
         }
+        
+        // Update status bar
+        statusBarItem.text = "$(book) Architector";
+        statusBarItem.tooltip = "Generate Architecture Documentation";
+        statusBarItem.command = 'architector-llm.generateDocs';
+        
+        // Setup completed, continue with generation
+        outputChannel.appendLine('✅ Setup completed - proceeding with documentation generation');
     }
     
     // Track event

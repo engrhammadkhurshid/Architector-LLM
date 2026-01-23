@@ -11,10 +11,22 @@ export class SetupWizard {
     constructor(private context: vscode.ExtensionContext) {}
     
     async run(): Promise<void> {
-        // Check if setup already completed
+        // Check if setup already completed (allow re-run by checking if explicitly called)
         const setupCompleted = this.context.globalState.get('setupCompleted', false);
         if (setupCompleted) {
-            return;
+            // Already completed - ask if user wants to reconfigure
+            const reconfigure = await vscode.window.showInformationMessage(
+                '✅ Setup already completed. Do you want to reconfigure?',
+                'Yes, Reconfigure',
+                'No, Cancel'
+            );
+            
+            if (reconfigure !== 'Yes, Reconfigure') {
+                return; // User doesn't want to reconfigure
+            }
+            
+            // Reset setup to allow reconfiguration
+            await this.context.globalState.update('setupCompleted', false);
         }
         
         // Welcome screen
