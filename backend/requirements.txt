@@ -1,10 +1,17 @@
+# ==============================================================================
+# Architector-LLM: Backend Engine Dependencies
+# ==============================================================================
+
 flask>=3.0.0
 flask-cors>=4.0.0
+gunicorn>=21.2.0
 python-dotenv>=1.0.0
 requests>=2.31.0
+
+# Tree-Sitter Core Engine
 tree-sitter==0.23.2
 
-# Language parsers - v0.23.0-0.23.2 compatible with tree-sitter 0.23.2
+# Language Grammar Parsers
 tree-sitter-python==0.23.2
 tree-sitter-javascript==0.23.1
 tree-sitter-typescript==0.23.2

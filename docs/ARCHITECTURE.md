@@ -1,437 +1,166 @@
-# Architecture Overview - Architector-LLM
+# Architecture Overview: Architector-LLM
 
-This document describes the technical architecture of the Architector-LLM system.
+**Research Publication:** *"From Code to Architecture: Leveraging LLMs for Automated Software Design Documentation"*  
+**Author:** Engr. Hammad Khurshid  
+**Institution:** National University of Sciences and Technology (NUST), Pakistan  
+**System Version:** v2.1.0
 
-## System Architecture
+---
 
-Architector-LLM follows a **Hybrid Frontend-Backend Architecture** to leverage both the VS Code extension ecosystem (TypeScript) and the data science/ML ecosystem (Python).
+## 1. System Philosophy & High-Level Architecture
+
+Architector-LLM employs a **Hybrid Client-Engine Architecture**:
+1. **Frontend (VS Code Extension):** Implemented in TypeScript, integrating deeply with VS Code APIs (`vscode.window`, `vscode.commands`, `SecretStorage`, Webviews, and StatusBar).
+2. **Core Pipeline Engine (Python):** Robust, high-performance AST parsing with Tree-sitter (11 languages), codebase metric profiling, rule/LLM-based architectural view selection, prompt curation, multi-model generation, 4-dimension quality validation, cross-diagram relationship mapping, and interactive documentation generation.
+3. **Analytics & Empirical Research Backend:** A lightweight, GDPR-compliant Flask service for optional participant registration, telemetry tracking, and empirical evaluation data export.
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      VS Code IDE                             │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │         Architector-LLM Extension (TypeScript)         │ │
-│  │                                                         │ │
-│  │  ├─ Command Handler                                   │ │
-│  │  ├─ Progress UI                                        │ │
-│  │  └─ Configuration Manager                             │ │
-│  └────────────────────────────────────────────────────────┘ │
-│                          │ HTTP/REST                         │
-└──────────────────────────┼───────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Python Backend (Flask Server)                   │
-│                                                              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │   Parser     │  │  LLM Client  │  │   Diagram    │     │
-│  │              │  │              │  │   Renderer   │     │
-│  │ Tree-sitter  │  │  DeepSeek    │  │   Mermaid    │     │
-│  │  AST         │  │   API        │  │    CLI       │     │
-│  └──────────────┘  └──────────────┘  └──────────────┘     │
-│          │                 │                 │              │
-│          └────────┬────────┴────────┬────────┘              │
-│                   ▼                 ▼                        │
-│          ┌──────────────┐  ┌──────────────┐                │
-│          │  Dependency  │  │    Output    │                │
-│          │    Graph     │  │  Organizer   │                │
-│          │   Builder    │  │              │                │
-│          └──────────────┘  └──────────────┘                │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    VS Code IDE Frontend (TypeScript)                         │
+│  ┌─────────────────┐  ┌───────────────────┐  ┌───────────────────────────┐  │
+│  │  Setup Wizard   │  │  API Key Manager  │  │  Webview Progress Panel   │  │
+│  └─────────────────┘  └───────────────────┘  └───────────────────────────┘  │
+│  ┌─────────────────┐  ┌───────────────────┐  ┌───────────────────────────┐  │
+│  │ Dependency Check│  │ Status Bar Item   │  │ Voluntary Telemetry Mgr   │  │
+│  └─────────────────┘  └───────────────────┘  └───────────────────────────┘  │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │ Subprocess / CLI (`architector.py`)
+                                       │ or REST API (`main.py:8765`)
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│               Python Core Backend Engine (`backend/src/`)                   │
+│                                                                             │
+│  1. Codebase Parsing & Graph Construction                                    │
+│     ├── Tree-sitter AST Parser (Python, JS, TS, PHP, Java, C, C++, C#, ...) │
+│     └── Dependency Graph Builder (Nodes, Edges, Import Flow)                │
+│                                                                             │
+│  2. Codebase Profiling & View Selection                                     │
+│     ├── Codebase Analyzer (Language, Paradigm, Architecture Patterns)       │
+│     └── Diagram Selector (Heuristic Prioritization: High / Medium / Low)    │
+│                                                                             │
+│  3. Multi-View Context Extraction & LLM Prompt Curators                     │
+│     ├── Specialized Context Extractors (Component, Class, Activity, C4, ...)│
+│     └── Multi-Provider LLM Client (Local Ollama, DeepSeek, OpenAI, Claude)  │
+│                                                                             │
+│  4. Quality Validation & Synthesis                                          │
+│     ├── Diagram Validator (Syntax, Completeness, Clarity, Accuracy)         │
+│     ├── Relationship Mapper (Cross-diagram entity correlation)              │
+│     └── Interactive Doc Generator (README.md, INDEX.md, RELATIONSHIPS.md)   │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+                                       ▼
+           Output: `docs/arch/v{version}_{timestamp}_{githash}/`
 ```
 
-## Component Overview
+---
 
-### 1. Frontend Layer (VS Code Extension)
+## 2. Component Directory Structure
 
-**Technology:** TypeScript, Node.js, VS Code Extension API
-
-**Responsibilities:**
-- User interface and command registration
-- Workspace file system access
-- Configuration management
-- Backend process lifecycle management
-- Progress reporting and notifications
-
-**Key Files:**
-- `src/extension.ts` - Entry point, activation/deactivation
-- `src/commands.ts` - Command implementations
-- `src/config.ts` - Configuration utilities
-
-**Communication:**
-- HTTP REST API calls to Python backend
-- Uses Axios for HTTP requests
-- Async/await pattern for non-blocking operations
-
-### 2. Backend Layer (Python Service)
-
-**Technology:** Python 3.9+, Flask, Tree-sitter
-
-**Responsibilities:**
-- HTTP API server
-- Code parsing and analysis
-- LLM API communication
-- Diagram rendering
-- Output organization
-
-**Sub-components:**
-
-#### 2.1. HTTP Server (`main.py`)
-
-- Flask-based REST API
-- CORS enabled for development
-- Health check endpoint
-- Async job processing (future)
-
-**Endpoints:**
 ```
-GET  /health              - Health check
-POST /generate           - Generate documentation
-GET  /status/:job_id     - Check generation status
-```
-
-#### 2.2. Parser Module (`parser/`)
-
-**Purpose:** Extract architectural metadata from source code
-
-**Components:**
-- `ast_parser.py` - Tree-sitter based AST parsing
-- `dependency_graph.py` - Build structured dependency graph
-
-**Capabilities:**
-- Multi-language support (Python, TypeScript/JavaScript)
-- Extract classes, functions, imports
-- Build complete dependency graph
-- Ignore patterns (node_modules, __pycache__, etc.)
-
-**Output Format:**
-```json
-{
-  "nodes": [
-    {"id": "file.py::ClassName", "type": "class", "name": "ClassName", "file": "file.py"}
-  ],
-  "edges": [
-    {"from": "file.py", "to": "file.py::ClassName", "type": "contains"}
-  ],
-  "metadata": {
-    "total_files": 42,
-    "total_classes": 15,
-    "total_functions": 87
-  }
-}
+Architector-LLM/
+├── vscode-extension/src/         # VS Code Extension (TypeScript)
+│   ├── extension.ts              # Extension activation and command router
+│   ├── setupWizard.ts            # First-run guided configuration
+│   ├── dependencyChecker.ts      # Python, Ollama, and model diagnostics
+│   ├── pythonRunner.ts           # Subprocess pipeline execution
+│   ├── progressPanel.ts          # Interactive webview progress UI
+│   ├── apiKeyManager.ts          # Secure VS Code SecretStorage client
+│   └── analytics/                # Empirical research data manager
+│       ├── developerInfo.ts      # Participant demographics modal
+│       └── telemetry.ts          # GDPR-compliant session logging
+├── backend/src/                  # Core Python Pipeline
+│   ├── pipeline.py               # DocumentationPipeline master orchestrator
+│   ├── main.py                   # Optional Flask HTTP service
+│   ├── parser/                   # AST & graph extraction
+│   │   ├── ast_parser.py         # Multi-language Tree-sitter AST parser
+│   │   └── dependency_graph.py   # Codebase graph builder
+│   ├── analyzer/                 # Project characterization
+│   │   ├── codebase_analyzer.py  # Language, pattern, and complexity profiler
+│   │   └── version_detector.py   # Semver extraction from git/manifests
+│   ├── diagram/                  # Multi-diagram generation
+│   │   ├── diagram_types.py      # Diagram registry and taxonomies
+│   │   ├── diagram_selector.py   # Rule-based and priority selector
+│   │   ├── context_extractors.py # Specialized AST context filters
+│   │   ├── multi_diagram_generator.py # Parallel diagram synthesis
+│   │   └── relationship_mapper.py # Entity tracking across diagrams
+│   ├── llm/                      # Model integration
+│   │   ├── client.py             # OllamaClient & LLMClient (DeepSeek, OpenAI)
+│   │   └── prompts/              # Architecture-specific prompt templates
+│   ├── validation/               # Quality evaluation
+│   │   ├── diagram_validator.py  # 4-dimension scoring engine
+│   │   └── quality_report.py     # Markdown report generator
+│   └── output/                   # Deliverables generation
+│       ├── interactive_docs.py   # INDEX.md and COMPARISONS.md generator
+│       ├── organizer.py          # Directory layout manager
+│       └── renderer.py           # Mermaid SVG/PNG rendering
+├── tests/                        # Comprehensive test suite
+│   ├── test_parser.py            # AST parsing and graph unit tests
+│   ├── test_setup.py             # Environment verification
+│   ├── test_analyzer.py          # Profiler and selector tests
+│   ├── test_prompts.py           # Prompt and context extraction tests
+│   ├── test_validation.py        # Quality validation tests
+│   ├── test_relationships.py     # Relationship mapping tests
+│   ├── test_pipeline.py          # End-to-end pipeline test on test-repo
+│   └── test_flask_app.py         # End-to-end test on real web app
+├── deploy/                       # Cloud deployment configs for telemetry
+├── docs/                         # Comprehensive documentation
+├── architector.py                # Standalone CLI entrypoint
+└── analytics_backend.py          # Telemetry and participant registration server
 ```
 
-#### 2.3. LLM Module (`llm/`)
+---
 
-**Purpose:** Interface with DeepSeek API and curate prompts
+## 3. Detailed Component Deep-Dive
 
-**Components:**
-- `client.py` - DeepSeek API client
-- `prompt_curator.py` - RAG-based prompt construction
+### 3.1. Abstract Syntax Tree (AST) Parsing & Dependency Graph
+- **Library:** `tree-sitter==0.23.2` with dedicated grammars for Python, JavaScript, TypeScript, PHP, Java, C, C++, C#, Go, Rust, and Ruby.
+- **Parsing Pass:** Traverses source code trees to extract class definitions, methods, signatures, standalone functions, module imports, and inheritance hierarchies.
+- **Graph Builder:** Generates a directed graph representing files, entities, and import dependencies.
 
-**Prompt Strategy:**
+### 3.2. Codebase Analyzer & Diagram Selector
+- **Profiling:** Analyzes primary language, paradigms (OOP, functional, procedural), detected frameworks (e.g. Django, Flask, Express, NestJS, Laravel), API endpoints, database models, and codebase scale (tiny, small, medium, large).
+- **Selection Engine:** Evaluates which diagrams will yield the highest informational value for the specific project profile. For example, a pure CLI tool prioritizes Component, Class, and Activity workflows, whereas an enterprise web API prioritizes C4 System Context and Data Flow.
 
-```python
-System Prompt (Fixed)
-    ↓
-RAG Context (Injected)
-    ↓
-User Instructions
-    ↓
-LLM Response
+### 3.3. Multi-Provider LLM Integration
+- **Local (Privacy-Preserving):** Automated detection of local Ollama instances (`http://localhost:11434`) running `deepseek-coder:6.7b`. No code leaves the developer's workstation.
+- **Cloud Providers:** DeepSeek API, OpenAI GPT-4, Anthropic Claude via encrypted `SecretStorage`.
+
+### 3.4. Multi-Diagram Synthesis Taxonomy
+The system synthesizes 6 standardized views:
+1. **Component Diagram:** High-level modular decomposition and external dependencies.
+2. **Class Diagram:** OOP class hierarchy, attributes, methods, and visibility.
+3. **Sequence Diagram:** Inter-object temporal message flows and method invocation sequences.
+4. **Activity Diagram:** Business logic execution workflows and branching decision trees.
+5. **Data Flow Diagram (DFD):** Input sources, transformations, and persistence sinks.
+6. **C4 System Context Diagram:** Enterprise boundary, user personas, and external system integrations.
+
+### 3.5. Quality Validation Engine
+Automated 4-dimension scoring validates each generated Mermaid diagram:
+- **Syntax (100-pt scale):** Validates Mermaid grammatical syntax, keywords, and delimiters.
+- **Completeness:** Verifies that major components, classes, and interactions identified in AST analysis are depicted.
+- **Clarity:** Evaluates diagram density, connection clarity, and absence of visual spaghetti.
+- **Accuracy:** Assesses structural fidelity against the parsed dependency graph.
+
+---
+
+## 4. Documentation Output Layout
+
+Every generation run produces an immutable, versioned documentation package:
+
 ```
-
-**Key Features:**
-- Secure API key management via environment variables
-- Configurable LLM parameters (temperature, max_tokens)
-- Structured prompt engineering
-- Error handling and retry logic
-
-#### 2.4. Diagram Module (`diagram/`)
-
-**Purpose:** Render Mermaid diagrams to visual assets
-
-**Components:**
-- `renderer.py` - Mermaid CLI wrapper
-
-**Capabilities:**
-- Render .mmd files to PNG/SVG
-- Extract Mermaid code from markdown
-- Batch rendering for multiple diagrams
-- Transparent background support
-
-**Dependencies:**
-- Requires @mermaid-js/mermaid-cli
-- Falls back gracefully if not installed
-
-#### 2.5. Output Module (`output/`)
-
-**Purpose:** Organize generated artifacts in versioned directories
-
-**Components:**
-- `organizer.py` - Directory creation and file management
-
-**Versioning Strategy:**
-```
-Format: v{semantic_version}_{timestamp}_{git_hash}
-Example: v1.0.0_2026-01-21-143022_abc123f
-```
-
-**Directory Structure:**
-```
-docs/arch/v1.0.0_2026-01-21-143022_abc123f/
-├── README.md                    # Main documentation
-├── INDEX.md                     # Artifact index
+docs/arch/v{version}_{timestamp}_{githash}/
+├── README.md               # Executive architecture summary
+├── INDEX.md                # Interactive cross-referenced navigation index
+├── RELATIONSHIPS.md        # Cross-diagram entity mapping and coverage analysis
+├── QUALITY_REPORT.md      # Automated quality scores and recommendations
+├── COMPARISONS.md         # Architectural delta against prior runs
 ├── diagrams/
-│   ├── architecture.mmd        # Mermaid source
-│   └── architecture.png        # Rendered image
+│   ├── component.mmd / .svg / .png
+│   ├── class.mmd / .svg / .png
+│   ├── sequence.mmd / .svg / .png
+│   ├── activity.mmd / .svg / .png
+│   ├── data_flow.mmd / .svg / .png
+│   └── c4_context.mmd / .svg / .png
 └── metadata/
-    └── generation_info.json    # Metrics and metadata
+    └── generation_info.json # Timing, token usage, model, and git metadata
 ```
-
-## Data Flow
-
-### Complete Pipeline
-
-```
-1. USER ACTION
-   └─ Click "Generate Documentation" in VS Code
-
-2. FRONTEND (TypeScript)
-   ├─ Validate workspace
-   ├─ Get codebase path
-   └─ POST /generate {codebase_path}
-
-3. BACKEND: PARSING (Python)
-   ├─ CodeParser.parse_directory()
-   ├─ Extract classes, functions, imports
-   └─ DependencyGraphBuilder.build_graph()
-
-4. BACKEND: RAG PREPARATION
-   ├─ PromptCurator.curate_prompt()
-   ├─ Inject dependency graph into prompt
-   └─ Combine with system instructions
-
-5. BACKEND: LLM GENERATION
-   ├─ LLMClient.generate()
-   ├─ Send to DeepSeek API
-   └─ Receive: Markdown + Mermaid code
-
-6. BACKEND: RENDERING
-   ├─ DiagramRenderer.render()
-   └─ Convert .mmd → .png
-
-7. BACKEND: ORGANIZATION
-   ├─ OutputOrganizer.create_output_directory()
-   ├─ Save documentation files
-   ├─ Save diagram files
-   └─ Save metadata
-
-8. FRONTEND: COMPLETION
-   ├─ Show success notification
-   └─ Offer to open documentation
-```
-
-## Design Patterns
-
-### 1. Modular Architecture
-
-Each component is self-contained with clear interfaces:
-- Parser doesn't know about LLM
-- LLM doesn't know about Output
-- Clean separation of concerns
-
-### 2. Configuration Management
-
-Centralized configuration via:
-- `.env` file for secrets
-- VS Code settings for user preferences
-- Default values with override capability
-
-### 3. Error Handling
-
-Multi-level error handling:
-- Frontend: User-friendly error messages
-- Backend: Detailed logging with context
-- LLM: Retry logic for transient failures
-
-### 4. Extensibility
-
-Easy to extend:
-- Add new language support: Extend `CodeParser`
-- Add new diagram types: Extend `DiagramRenderer`
-- Add new LLM providers: Implement `LLMClient` interface
-
-## Technology Choices
-
-### Why TypeScript for Frontend?
-
-- Native VS Code extension language
-- Type safety for IDE API
-- Rich ecosystem of VS Code extension tools
-
-### Why Python for Backend?
-
-- Superior AST parsing libraries (Tree-sitter)
-- Easy LLM API integration
-- Strong data manipulation capabilities
-- Familiar to ML/AI researchers
-
-### Why Flask?
-
-- Lightweight and simple
-- Easy to debug
-- Sufficient for local development
-- Future: Can scale to FastAPI if needed
-
-### Why Tree-sitter?
-
-- Multi-language support out of the box
-- Fast incremental parsing
-- Robust error recovery
-- Production-ready (used by GitHub)
-
-### Why Mermaid?
-
-- Text-based (LLM-friendly)
-- GitHub native support
-- Easy to version control
-- JavaScript-based (no Java dependency like PlantUML)
-
-## Security Considerations
-
-### API Key Management
-
-- Stored in `.env` file (gitignored)
-- Never logged or transmitted except to API
-- Environment variable isolation
-
-### Code Privacy
-
-- All processing happens locally
-- Only metadata sent to LLM (not full code)
-- User consent required before generation
-- Option for fully local LLM (future)
-
-### HTTP Communication
-
-- Local-only communication (localhost:8765)
-- CORS enabled for development
-- No external exposure by default
-
-## Performance Considerations
-
-### Parsing Optimization
-
-- Incremental parsing (Tree-sitter)
-- Parallel file processing (future)
-- Smart ignore patterns
-
-### LLM Optimization
-
-- Prompt size optimization
-- Token limit management
-- Context window utilization
-- Streaming responses (future)
-
-### Caching Strategy (Future)
-
-- Cache parsed AST
-- Cache dependency graph
-- Incremental updates only
-
-## Scalability
-
-### Current Limitations
-
-- Single-threaded backend
-- Synchronous LLM calls
-- Local-only deployment
-
-### Future Improvements
-
-- Async/await in backend (FastAPI)
-- Job queue for long-running tasks
-- Distributed parsing
-- Cloud deployment option
-
-## Research Considerations
-
-### Reproducibility
-
-- All LLM parameters logged
-- Git hash included in output
-- Prompt templates versioned
-- Deterministic output (low temperature)
-
-### Metrics Collection
-
-Collected in `generation_info.json`:
-- Processing time
-- Files analyzed
-- Tokens used
-- Model version
-- Timestamp
-- Git hash
-
-### Evaluation Framework
-
-Supports research evaluation:
-- Ground truth comparison (dependency graph)
-- Fidelity metrics (diagram accuracy)
-- Performance metrics (time, tokens)
-
-## Testing Strategy
-
-### Unit Tests
-
-- Parser: Test extraction accuracy
-- Graph Builder: Test graph correctness
-- LLM Client: Test API communication
-- Renderer: Test diagram generation
-
-### Integration Tests
-
-- End-to-end pipeline
-- Frontend-backend communication
-- File system operations
-
-### Validation Tests
-
-- Output format validation
-- Dependency graph validation
-- Documentation completeness
-
-## Development Roadmap
-
-### Phase 1: Foundation (Current)
-- ✅ Project setup
-- 🔄 Basic parser
-- 🔄 Dependency graph
-- 🔄 IDE integration
-
-### Phase 2: LLM Integration
-- LLM API client
-- Prompt engineering
-- Basic generation
-- Diagram rendering
-
-### Phase 3: Polish
-- Output organization
-- Git integration
-- Multi-language support
-- User experience
-
-### Phase 4: Research
-- Metrics collection
-- Case studies
-- Evaluation framework
-- Documentation
-
-## References
-
-- [VS Code Extension API](https://code.visualstudio.com/api)
-- [Tree-sitter](https://tree-sitter.github.io/tree-sitter/)
-- [DeepSeek API](https://platform.deepseek.com/api-docs/)
-- [Mermaid](https://mermaid.js.org/)
-- [Flask](https://flask.palletsprojects.com/)

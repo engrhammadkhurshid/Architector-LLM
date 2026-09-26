@@ -1,13 +1,76 @@
-analytics_data/
-__pycache__/
-*.pyc
+# ==============================================================================
+# Architector-LLM .gitignore
+# ==============================================================================
+
+# Environment and Secrets
 .env
-.venv/
+*.env.local
+*.env.*.local
+
+# Python Build and Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Python Virtual Environments
 venv/
-*.log
-.DS_Store
-*.vsix
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Node.js and VS Code Extension Build Artifacts
 node_modules/
 out/
 dist/
-vscode-extension/out/
+.vscode-test/
+*.vsix
+*.vsix.zip
+
+# Runtime & Test Outputs
+*.log
+backend.log
+test_output/
+analytics_data/
+participant_data_*.json
+*.tmp
+test-flask-app/docs/arch/*
+!test-flask-app/docs/arch/*_nogit
+!test-flask-app/docs/arch/*_nogit/**
+test-repo/docs/arch/*
+!test-repo/docs/arch/*_nogit
+!test-repo/docs/arch/*_nogit/**
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Cloned External Benchmark Repositories (large 3rd-party codebases)
+test-projects/
+test-projects-apps/

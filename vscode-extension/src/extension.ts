@@ -784,17 +784,23 @@ async function showAbout(context: vscode.ExtensionContext) {
 }
 
 async function showPrivacyPolicy(context: vscode.ExtensionContext) {
-    const privacyPolicyPath = path.join(
-        path.dirname(context.extensionPath),
-        'PRIVACY_POLICY.md'
-    );
+    const candidatePaths = [
+        path.join(context.extensionPath, 'docs', 'PRIVACY_POLICY.md'),
+        path.join(context.extensionPath, 'PRIVACY_POLICY.md'),
+        path.join(path.dirname(context.extensionPath), 'docs', 'PRIVACY_POLICY.md'),
+        path.join(path.dirname(context.extensionPath), 'PRIVACY_POLICY.md')
+    ];
     
-    try {
-        const doc = await vscode.workspace.openTextDocument(privacyPolicyPath);
-        await vscode.window.showTextDocument(doc, { preview: false });
-    } catch (error) {
-        vscode.window.showErrorMessage('Privacy policy file not found');
+    for (const p of candidatePaths) {
+        try {
+            const doc = await vscode.workspace.openTextDocument(p);
+            await vscode.window.showTextDocument(doc, { preview: false });
+            return;
+        } catch {
+            // Try next candidate path
+        }
     }
+    vscode.window.showErrorMessage('Privacy policy file not found');
 }
 
 export function deactivate() {

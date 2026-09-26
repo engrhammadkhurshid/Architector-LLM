@@ -101,7 +101,7 @@ export class AnalyticsManager {
         }
         
         const devInfo = await devInfoManager.getDeveloperInfo();
-        if (!devInfo) return;
+        if (!devInfo) {return;}
         
         const projectMetadata = await this.analyzeProject(data.projectPath);
         const llmProvider = vscode.workspace.getConfiguration('architector').get<string>('llmProvider', 'ollama');

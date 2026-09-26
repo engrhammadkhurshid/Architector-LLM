@@ -227,7 +227,8 @@ REQUIREMENTS:
 5. Follow C4 model conventions (Person, System, relationship)
 6. Keep the diagram clean (max 8-10 external entities)
 
-MERMAID SYNTAX (using flowchart for C4):
+MERMAID SYNTAX:
+- Note: Use Mermaid flowchart syntax for C4 context modeling
 - Start with `flowchart TD`
 - Person/Actor: `user([User Name])`
 - System (main): `system[System Name]`

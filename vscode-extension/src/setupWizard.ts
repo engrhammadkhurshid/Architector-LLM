@@ -55,7 +55,7 @@ This wizard has 3 simple steps:
         
         // Step 1: Choose LLM Provider
         const provider = await this.selectLLMProvider();
-        if (!provider) return;
+        if (!provider) {return;}
         
         await vscode.workspace.getConfiguration('architector').update(
             'llmProvider',
@@ -66,7 +66,7 @@ This wizard has 3 simple steps:
         // Step 2: Configure selected provider
         if (provider !== 'ollama') {
             const configured = await this.configureAPIProvider(provider);
-            if (!configured) return;
+            if (!configured) {return;}
         } else {
             await this.showOllamaInstructions();
         }
@@ -121,7 +121,7 @@ This wizard has 3 simple steps:
             title: 'Architector Setup: LLM Provider'
         });
         
-        if (!choice) return undefined;
+        if (!choice) {return undefined;}
         
         if (choice.value === 'api') {
             return await this.selectAPIProvider();
@@ -209,7 +209,7 @@ This wizard has 3 simple steps:
             }
         });
         
-        if (!apiKey) return false;
+        if (!apiKey) {return false;}
         
         // Store API key securely
         await apiKeyManager.storeApiKey(provider, apiKey);

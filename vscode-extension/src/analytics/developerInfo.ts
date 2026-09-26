@@ -86,19 +86,19 @@ export class DeveloperInfoManager {
             ignoreFocusOut: true,
             validateInput: (value) => value.trim() ? null : 'Name is required'
         });
-        if (!fullName) return;
+        if (!fullName) {return;}
         
         const email = await vscode.window.showInputBox({
             prompt: 'Your email address',
             placeHolder: 'e.g., john.doe@example.com',
             ignoreFocusOut: true,
             validateInput: (value) => {
-                if (!value) return 'Email is required';
-                if (!value.includes('@')) return 'Please enter a valid email';
+                if (!value) {return 'Email is required';}
+                if (!value.includes('@')) {return 'Please enter a valid email';}
                 return null;
             }
         });
-        if (!email) return;
+        if (!email) {return;}
         
         const designation = await vscode.window.showInputBox({
             prompt: 'Your job title/designation',
@@ -106,7 +106,7 @@ export class DeveloperInfoManager {
             ignoreFocusOut: true,
             validateInput: (value) => value.trim() ? null : 'Designation is required'
         });
-        if (!designation) return;
+        if (!designation) {return;}
         
         const experienceLevel = await vscode.window.showQuickPick([
             { label: 'Junior Developer', detail: '0-2 years experience', value: 'junior' },
@@ -121,7 +121,7 @@ export class DeveloperInfoManager {
             placeHolder: 'Select your experience level',
             ignoreFocusOut: true
         });
-        if (!experienceLevel) return;
+        if (!experienceLevel) {return;}
         
         const organization = await vscode.window.showInputBox({
             prompt: 'Organization/Company (optional)',
