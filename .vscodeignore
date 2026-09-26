@@ -23,6 +23,8 @@ debug_*.py
 *.md
 !README.md
 !CHANGELOG.md
+!docs/PRIVACY_POLICY.md
+!docs/**
 webpack.config.js
 tsconfig.json
 .eslintrc.json
